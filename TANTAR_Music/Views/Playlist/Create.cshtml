@@ -1,0 +1,33 @@
+@model PlaylistViewModel
+@{ ViewData["Title"] = "New Playlist"; }
+
+<div class="page-content">
+    <div class="tantar-form-card">
+        <h1 class="fw-bold mb-4">New Playlist</h1>
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label fw-semibold"></label>
+                <input asp-for="Name" class="form-control bg-dark border-secondary text-white" placeholder="Playlist name" />
+                <span asp-validation-for="Name" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label fw-semibold"></label>
+                <textarea asp-for="Description" rows="2" class="form-control bg-dark border-secondary text-white" placeholder="Optional description…"></textarea>
+            </div>
+            <div class="mb-3">
+                <label asp-for="CoverImage" class="form-label fw-semibold">Cover Image</label>
+                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control bg-dark border-secondary text-white" />
+            </div>
+            <div class="form-check mb-4">
+                <input asp-for="IsPublic" class="form-check-input" />
+                <label asp-for="IsPublic" class="form-check-label">Make playlist public</label>
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-tantar px-4">Create</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

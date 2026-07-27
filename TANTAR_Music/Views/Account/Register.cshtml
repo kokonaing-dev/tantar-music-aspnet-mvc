@@ -1,0 +1,43 @@
+@model RegisterViewModel
+@{ ViewData["Title"] = "Sign Up"; }
+
+<div class="d-flex align-items-center justify-content-center" style="min-height:80vh">
+    <div class="tantar-form-card w-100">
+        <h1 class="text-center fw-bold mb-1">Sign up for free</h1>
+        <p class="text-center text-secondary mb-4">Start listening to TANTAR Music</p>
+
+        <form asp-action="Register" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+            <div class="mb-3">
+                <label asp-for="DisplayName" class="form-label fw-semibold small text-uppercase letter-spacing-1"></label>
+                <input asp-for="DisplayName" class="form-control bg-dark border-secondary text-white" placeholder="Your name" />
+                <span asp-validation-for="DisplayName" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Email" class="form-label fw-semibold small text-uppercase"></label>
+                <input asp-for="Email" class="form-control bg-dark border-secondary text-white" placeholder="name@example.com" />
+                <span asp-validation-for="Email" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Password" class="form-label fw-semibold small text-uppercase"></label>
+                <input asp-for="Password" type="password" class="form-control bg-dark border-secondary text-white" placeholder="Create a password" />
+                <span asp-validation-for="Password" class="text-danger small"></span>
+            </div>
+            <div class="mb-4">
+                <label asp-for="ConfirmPassword" class="form-label fw-semibold small text-uppercase"></label>
+                <input asp-for="ConfirmPassword" type="password" class="form-control bg-dark border-secondary text-white" placeholder="Confirm password" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+            </div>
+
+            <button type="submit" class="btn btn-tantar w-100 py-2 rounded-pill fw-bold">Create account</button>
+        </form>
+
+        <hr class="border-secondary my-4" />
+        <p class="text-center text-secondary small">
+            Already have an account? <a asp-action="Login" class="text-white">Log in</a>
+        </p>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

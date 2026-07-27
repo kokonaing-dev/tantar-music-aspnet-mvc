@@ -1,0 +1,71 @@
+@model SongViewModel
+@{ ViewData["Title"] = "Edit Song"; }
+
+<div class="page-content">
+    <div class="tantar-form-card" style="max-width:600px">
+        <h1 class="fw-bold mb-4">Edit Song</h1>
+
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ExistingFilePath" />
+            <input type="hidden" asp-for="ExistingCoverPath" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold"></label>
+                <input asp-for="Title" class="form-control bg-dark border-secondary text-white" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label asp-for="ArtistId" class="form-label fw-semibold"></label>
+                    <select asp-for="ArtistId" asp-items="Model.Artists" class="form-select bg-dark border-secondary text-white"></select>
+                </div>
+                <div class="col">
+                    <label asp-for="AlbumId" class="form-label fw-semibold"></label>
+                    <select asp-for="AlbumId" asp-items="Model.Albums" class="form-select bg-dark border-secondary text-white">
+                        <option value="">– No album –</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Genre" class="form-label fw-semibold"></label>
+                <input asp-for="Genre" class="form-control bg-dark border-secondary text-white" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="AudioFile" class="form-label fw-semibold">Replace Audio File</label>
+                @if (Model.ExistingFilePath != null)
+                {
+                    <p class="text-secondary small">Current: @System.IO.Path.GetFileName(Model.ExistingFilePath)</p>
+                }
+                <input asp-for="AudioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a"
+                       class="form-control bg-dark border-secondary text-white" />
+                <div class="form-text text-secondary">Leave blank to keep current file</div>
+            </div>
+            <div class="mb-4">
+                <label asp-for="CoverImage" class="form-label fw-semibold">Replace Cover</label>
+                @if (Model.ExistingCoverPath != null)
+                {
+                    <img src="@Model.ExistingCoverPath" alt="Current cover" class="d-block mb-2 rounded" style="height:80px" />
+                }
+                <input asp-for="CoverImage" type="file" accept="image/*"
+                       class="form-control bg-dark border-secondary text-white" />
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-tantar px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+
+        <hr class="border-secondary my-4" />
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+              onsubmit="return confirm('Delete this song permanently?')">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash me-1"></i>Delete Song
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

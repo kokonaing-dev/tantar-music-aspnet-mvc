@@ -1,0 +1,52 @@
+@model AlbumViewModel
+@{ ViewData["Title"] = "Edit Album"; }
+
+<div class="page-content">
+    <div class="tantar-form-card" style="max-width:560px">
+        <h1 class="fw-bold mb-4">Edit Album</h1>
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ExistingCoverPath" />
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold"></label>
+                <input asp-for="Title" class="form-control bg-dark border-secondary text-white" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="ArtistId" class="form-label fw-semibold"></label>
+                <select asp-for="ArtistId" asp-items="Model.Artists" class="form-select bg-dark border-secondary text-white"></select>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label asp-for="ReleaseDate" class="form-label fw-semibold"></label>
+                    <input asp-for="ReleaseDate" type="date" class="form-control bg-dark border-secondary text-white" />
+                </div>
+                <div class="col">
+                    <label asp-for="Genre" class="form-label fw-semibold"></label>
+                    <input asp-for="Genre" class="form-control bg-dark border-secondary text-white" />
+                </div>
+            </div>
+            <div class="mb-4">
+                <label asp-for="CoverImage" class="form-label fw-semibold">Replace Cover</label>
+                @if (Model.ExistingCoverPath != null)
+                {
+                    <img src="@Model.ExistingCoverPath" class="d-block mb-2 rounded" style="height:80px" alt="Cover" />
+                }
+                <input asp-for="CoverImage" type="file" accept="image/*" class="form-control bg-dark border-secondary text-white" />
+            </div>
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-tantar px-4">Save</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+        <hr class="border-secondary my-4" />
+        <form asp-action="Delete" asp-route-id="@Model.Id" method="post"
+              onsubmit="return confirm('Delete this album?')">
+            <button type="submit" class="btn btn-outline-danger btn-sm">
+                <i class="bi bi-trash me-1"></i>Delete Album
+            </button>
+        </form>
+    </div>
+</div>
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

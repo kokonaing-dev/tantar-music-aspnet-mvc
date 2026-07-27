@@ -1,0 +1,121 @@
+@model ArtistDetailViewModel
+@{
+    ViewData["Title"] = Model.Name;
+    bool isAdmin = User.IsInRole("Admin");
+    bool isAuth = User.Identity?.IsAuthenticated == true;
+    bool showActions = isAdmin || isAuth;
+}
+
+<div class="page-content">
+    <!-- Hero -->
+    <div class="d-flex align-items-end gap-4 mb-4 pb-3 border-bottom border-secondary">
+        <img src="@(Model.ImagePath ?? "/images/default-artist.svg")"
+             alt="@Model.Name" class="rounded-circle shadow"
+             style="width:160px;height:160px;object-fit:cover;flex-shrink:0" />
+        <div>
+            <div class="text-secondary small text-uppercase fw-bold">Artist</div>
+            <h1 class="fw-bold mb-1">@Model.Name</h1>
+            @if (Model.Bio != null)
+            {
+                <p class="text-secondary">@Model.Bio</p>
+            }
+            <div class="text-secondary small">
+                @Model.Songs.Count song@(Model.Songs.Count != 1 ? "s" : "") ·
+                @Model.Albums.Count album@(Model.Albums.Count != 1 ? "s" : "")
+            </div>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-light mt-3">
+                    <i class="bi bi-pencil me-1"></i>Edit
+                </a>
+            }
+        </div>
+    </div>
+
+    @if (Model.Albums.Any())
+    {
+        <section class="mb-5">
+            <h2 class="fw-bold mb-3">Albums</h2>
+            <div class="grid-cards">
+                @foreach (var album in Model.Albums)
+                {
+                    <a asp-controller="Album" asp-action="Details" asp-route-id="@album.Id"
+                       class="tantar-card text-decoration-none text-white">
+                        <img src="@(album.CoverImagePath ?? "/images/default-cover.svg")"
+                             alt="@album.Title" class="tantar-card-cover" />
+                        <div class="fw-semibold text-truncate">@album.Title</div>
+                        <div class="small text-secondary">@album.ReleaseDate.Year</div>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.Songs.Any())
+    {
+        <section>
+            <h2 class="fw-bold mb-3">Popular Songs</h2>
+            <div data-queue="artist-songs">
+                @{ int i = 0; }
+                @foreach (var s in Model.Songs.OrderByDescending(x => x.PlayCount).Take(10))
+                {
+                    i++;
+                    <div class="song-row @(showActions ? "has-actions" : "")" data-queue-context="true">
+                        <span class="song-num text-secondary text-center">@i</span>
+                        <button class="song-play btn btn-link p-0 text-white align-items-center justify-content-center"
+                                data-play="@s.FilePath" data-song-id="@s.Id"
+                                data-title="@s.Title" data-artist="@s.ArtistName"
+                                data-cover="@(s.CoverImagePath ?? "")">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <img src="@(s.CoverImagePath ?? "/images/default-cover.svg")" alt=""
+                             class="rounded" style="width:40px;height:40px;object-fit:cover" />
+                        <div class="overflow-hidden">
+                            <div class="song-title fw-semibold text-truncate">@s.Title</div>
+                        </div>
+                        <span class="text-secondary small text-truncate">@(s.AlbumTitle ?? "–")</span>
+                        <span class="text-secondary small text-end">@s.PlayCount</span>
+                        <span class="text-secondary small text-end">@s.FormattedDuration</span>
+
+                        @if (showActions)
+                        {
+                            <div class="dropdown d-flex justify-content-end">
+                                <button class="btn btn-link p-0 song-actions-btn"
+                                        data-bs-toggle="dropdown" title="More options">
+                                    <i class="bi bi-three-dots"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                    @if (isAuth)
+                                    {
+                                        <li>
+                                            <button class="dropdown-item" data-add-to-playlist="@s.Id">
+                                                <i class="bi bi-plus-circle me-2"></i>Add to playlist
+                                            </button>
+                                        </li>
+                                    }
+                                    @if (isAdmin)
+                                    {
+                                        @if (isAuth) { <li><hr class="dropdown-divider" /></li> }
+                                        <li>
+                                            <a class="dropdown-item" asp-controller="Song" asp-action="Edit" asp-route-id="@s.Id">
+                                                <i class="bi bi-pencil me-2"></i>Edit song
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <form asp-controller="Song" asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                                  onsubmit="return confirm('Delete «@s.Title»?')">
+                                                <button type="submit" class="dropdown-item text-danger">
+                                                    <i class="bi bi-trash me-2"></i>Delete song
+                                                </button>
+                                            </form>
+                                        </li>
+                                    }
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                }
+            </div>
+        </section>
+    }
+</div>

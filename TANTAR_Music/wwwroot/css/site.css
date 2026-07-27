@@ -1,0 +1,481 @@
+/* ===== TANTAR Music – Spotify-inspired dark theme ===== */
+
+:root {
+    --tantar-bg: #121212;
+    --tantar-surface: #181818;
+    --tantar-surface2: #242424;
+    --tantar-surface3: #2a2a2a;
+    --tantar-sidebar: #000000;
+    --tantar-player: #181818;
+    --tantar-accent: #1db954;
+    --tantar-accent-hover: #1ed760;
+    --tantar-text: #ffffff;
+    --tantar-muted: #a7a7a7;
+    --tantar-subtle: #535353;
+    --tantar-sidebar-w: 240px;
+    --tantar-player-h: 90px;
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --transition: 0.15s ease;
+}
+
+* { box-sizing: border-box; }
+html { height: 100%; }
+
+body.tantar-body {
+    background: var(--tantar-bg);
+    color: var(--tantar-text);
+    font-family: 'Circular', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ===========================
+   LAYOUT
+   =========================== */
+.tantar-layout {
+    display: grid;
+    grid-template-columns: var(--tantar-sidebar-w) 1fr;
+    height: calc(100vh - var(--tantar-player-h));
+}
+
+/* ===========================
+   SIDEBAR
+   =========================== */
+.tantar-sidebar {
+    background: var(--tantar-sidebar);
+    overflow-y: auto;
+    scrollbar-width: thin;
+}
+
+.tantar-logo { color: var(--tantar-text); }
+
+.tantar-nav-link {
+    color: var(--tantar-muted);
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: color var(--transition), background var(--transition);
+}
+.tantar-nav-link:hover { color: var(--tantar-text); background: #ffffff14; }
+.tantar-nav-link.active { color: var(--tantar-text); background: #ffffff1a; }
+
+/* ===========================
+   MAIN CONTENT
+   =========================== */
+.tantar-main {
+    background: linear-gradient(180deg, #1a1a2e 0%, var(--tantar-bg) 400px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #404040 transparent;
+}
+
+.page-content { padding: 1.5rem 2rem; }
+
+/* ===========================
+   PLAYER BAR
+   =========================== */
+.tantar-player {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: var(--tantar-player-h);
+    background: var(--tantar-player);
+    border-top: 1px solid #282828;
+    z-index: 1000;
+}
+
+.player-info  { min-width: 180px; max-width: 220px; }
+.player-cover { width: 56px; height: 56px; object-fit: cover; flex-shrink: 0; }
+.player-volume { min-width: 140px; justify-content: flex-end; }
+
+/* Player control buttons */
+#btn-play-pause {
+    background: var(--tantar-text);
+    border: none;
+    border-radius: 50%;
+    width: 38px; height: 38px;
+    display: flex; align-items: center; justify-content: center;
+    transition: transform var(--transition), background var(--transition);
+    color: #000;
+    flex-shrink: 0;
+}
+#btn-play-pause:hover {
+    background: #e8e8e8;
+    transform: scale(1.06);
+}
+#btn-play-pause:active { transform: scale(0.97); }
+
+#btn-prev, #btn-next {
+    background: none;
+    border: none;
+    color: var(--tantar-muted);
+    padding: 6px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: color var(--transition), transform var(--transition);
+    font-size: 1.35rem;
+}
+#btn-prev:hover, #btn-next:hover {
+    color: var(--tantar-text);
+    transform: scale(1.1);
+}
+
+/* ===========================
+   CARDS (albums, artists)
+   =========================== */
+.tantar-card {
+    background: var(--tantar-surface);
+    border-radius: var(--radius-md);
+    padding: 1rem;
+    transition: background var(--transition);
+    position: relative;
+}
+.tantar-card:hover { background: var(--tantar-surface2); }
+
+.tantar-card-cover {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+    margin-bottom: 0.75rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    transition: box-shadow var(--transition);
+}
+.tantar-card:hover .tantar-card-cover {
+    box-shadow: 0 12px 32px rgba(0,0,0,.7);
+}
+.tantar-card-cover.rounded-circle { border-radius: 50% !important; }
+
+/* Card clickable link area */
+.card-link { text-decoration: none; color: inherit; display: block; }
+
+/* Card play overlay button */
+.play-btn-overlay {
+    position: absolute;
+    bottom: calc(1rem + 0.75rem + 1.4rem + 8px); /* sits above text */
+    right: 1.25rem;
+    width: 44px; height: 44px;
+    background: var(--tantar-accent);
+    border-radius: 50%;
+    border: none;
+    display: flex; align-items: center; justify-content: center;
+    color: #000;
+    font-size: 1.1rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,.5);
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.2s ease, transform 0.2s ease, background 0.15s ease, box-shadow 0.15s ease;
+    cursor: pointer;
+}
+.tantar-card:hover .play-btn-overlay {
+    opacity: 1;
+    transform: translateY(0);
+}
+.play-btn-overlay:hover {
+    background: var(--tantar-accent-hover);
+    transform: translateY(0) scale(1.06) !important;
+    box-shadow: 0 12px 32px rgba(0,0,0,.6);
+}
+.play-btn-overlay:active { transform: translateY(0) scale(0.97) !important; }
+
+/* Card admin action buttons */
+.card-admin-actions {
+    display: flex;
+    gap: 6px;
+    margin-top: 10px;
+}
+
+.card-admin-actions .btn-card-action {
+    flex: 1;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 20px;
+    border: 1px solid var(--tantar-subtle);
+    background: transparent;
+    color: var(--tantar-muted);
+    transition: color var(--transition), border-color var(--transition), background var(--transition);
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    white-space: nowrap;
+}
+.card-admin-actions .btn-card-action:hover {
+    color: var(--tantar-text);
+    border-color: var(--tantar-text);
+    background: #ffffff0d;
+}
+.card-admin-actions .btn-card-action.btn-card-delete {
+    border-color: transparent;
+    color: var(--tantar-subtle);
+}
+.card-admin-actions .btn-card-action.btn-card-delete:hover {
+    color: #ff4b4b;
+    border-color: #ff4b4b33;
+    background: #ff4b4b0d;
+}
+
+/* ===========================
+   SONG ROWS
+   =========================== */
+.song-row {
+    display: grid;
+    grid-template-columns: 32px 40px 1fr auto 80px 60px;
+    align-items: center;
+    gap: 12px;
+    padding: 6px 16px;
+    border-radius: var(--radius-sm);
+    transition: background var(--transition);
+    user-select: none;
+}
+.song-row.has-actions {
+    grid-template-columns: 32px 40px 1fr auto 80px 60px 32px;
+}
+.song-row:hover { background: #ffffff12; }
+
+/* Number ↔ play icon swap */
+.song-num {
+    font-size: 0.875rem;
+    line-height: 1;
+    text-align: center;
+}
+.song-play {
+    display: none;
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    color: var(--tantar-text);
+    font-size: 0.85rem;
+    transition: background var(--transition), transform var(--transition);
+    cursor: pointer;
+}
+.song-row:hover .song-num { display: none; }
+.song-row:hover .song-play { display: flex; }
+.song-play:hover {
+    background: #ffffff1a;
+    transform: scale(1.1);
+}
+.song-play:active { transform: scale(0.94); }
+
+/* Currently playing highlight */
+.song-row.playing .song-title { color: var(--tantar-accent); }
+.song-row.playing .song-num::before {
+    content: '▶';
+    color: var(--tantar-accent);
+    font-size: 0.6rem;
+}
+
+/* Song text */
+.song-title { font-size: 0.9rem; }
+
+/* ⋮ action button */
+.song-actions-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    color: var(--tantar-muted);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1rem;
+    opacity: 0;
+    transition: opacity var(--transition), background var(--transition), color var(--transition);
+    cursor: pointer;
+}
+.song-row:hover .song-actions-btn { opacity: 1; }
+.song-actions-btn:hover {
+    background: #ffffff1a;
+    color: var(--tantar-text);
+}
+.song-actions-btn:active { background: #ffffff25; }
+
+/* ===========================
+   DROPDOWNS
+   =========================== */
+.dropdown-menu.dropdown-menu-dark {
+    background: #282828;
+    border: 1px solid #3a3a3a;
+    border-radius: var(--radius-md);
+    box-shadow: 0 8px 32px rgba(0,0,0,.6);
+    padding: 4px;
+    min-width: 180px;
+}
+.dropdown-menu.dropdown-menu-dark .dropdown-item {
+    color: var(--tantar-text);
+    font-size: 0.875rem;
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    transition: background var(--transition);
+    display: flex; align-items: center;
+}
+.dropdown-menu.dropdown-menu-dark .dropdown-item:hover {
+    background: #ffffff14;
+    color: var(--tantar-text);
+}
+.dropdown-menu.dropdown-menu-dark .dropdown-item.text-danger:hover {
+    background: #ff4b4b14;
+    color: #ff6b6b;
+}
+.dropdown-menu.dropdown-menu-dark .dropdown-divider {
+    border-color: #3a3a3a;
+    margin: 4px 0;
+}
+
+/* ===========================
+   FORMS & INPUTS
+   =========================== */
+.tantar-form-card {
+    background: var(--tantar-surface);
+    border-radius: var(--radius-lg);
+    padding: 2rem;
+    max-width: 480px;
+    margin: 2rem auto;
+}
+
+.form-control, .form-select {
+    transition: border-color var(--transition), box-shadow var(--transition);
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--tantar-accent) !important;
+    box-shadow: 0 0 0 2px rgba(29,185,84,.2) !important;
+}
+
+/* ===========================
+   BUTTONS
+   =========================== */
+.btn-tantar {
+    background: var(--tantar-accent);
+    border-color: var(--tantar-accent);
+    color: #000;
+    font-weight: 700;
+    transition: background var(--transition), transform var(--transition), box-shadow var(--transition);
+}
+.btn-tantar:hover {
+    background: var(--tantar-accent-hover);
+    border-color: var(--tantar-accent-hover);
+    color: #000;
+    transform: scale(1.02);
+}
+.btn-tantar:active { transform: scale(0.98); }
+
+/* Outline variants that feel right in dark mode */
+.btn-outline-light {
+    border-color: var(--tantar-subtle);
+    color: var(--tantar-text);
+    transition: background var(--transition), border-color var(--transition);
+}
+.btn-outline-light:hover {
+    background: #ffffff1a;
+    border-color: var(--tantar-text);
+    color: var(--tantar-text);
+}
+.btn-outline-secondary {
+    border-color: var(--tantar-subtle);
+    color: var(--tantar-muted);
+    transition: background var(--transition), border-color var(--transition), color var(--transition);
+}
+.btn-outline-secondary:hover {
+    background: #ffffff14;
+    border-color: var(--tantar-muted);
+    color: var(--tantar-text);
+}
+.btn-outline-danger {
+    border-color: #ff4b4b55;
+    color: #ff6b6b;
+    transition: background var(--transition), border-color var(--transition);
+}
+.btn-outline-danger:hover {
+    background: #ff4b4b14;
+    border-color: #ff4b4b;
+    color: #ff6b6b;
+}
+
+/* Focus ring override — use accent color */
+.btn:focus-visible {
+    outline: 2px solid var(--tantar-accent);
+    outline-offset: 2px;
+    box-shadow: none;
+}
+
+/* ===========================
+   GRID LAYOUTS
+   =========================== */
+.grid-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+    gap: 1rem;
+}
+
+/* ===========================
+   SECTION HEADERS
+   =========================== */
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 1rem;
+}
+.section-header h2 { font-size: 1.5rem; font-weight: 700; margin: 0; }
+
+.section-link {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--tantar-muted);
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    transition: color var(--transition);
+}
+.section-link:hover { color: var(--tantar-text); }
+
+/* ===========================
+   TOAST NOTIFICATION
+   =========================== */
+.tantar-toast {
+    position: fixed;
+    bottom: calc(var(--tantar-player-h) + 20px);
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #333;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 24px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    z-index: 2000;
+    pointer-events: none;
+    white-space: nowrap;
+    box-shadow: 0 4px 20px rgba(0,0,0,.6);
+}
+.tantar-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.tantar-toast-error { background: #c0392b; }
+
+/* ===========================
+   SCROLLBAR
+   =========================== */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #404040; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #505050; }
+
+/* ===========================
+   RANGE INPUT
+   =========================== */
+input[type=range] { accent-color: var(--tantar-accent); cursor: pointer; }
+
+/* ===========================
+   RESPONSIVE
+   =========================== */
+@media (max-width: 768px) {
+    .tantar-layout { grid-template-columns: 1fr; }
+    .tantar-sidebar { display: none; }
+    .grid-cards { grid-template-columns: repeat(2, 1fr); }
+    .player-volume { display: none !important; }
+    .page-content { padding: 1rem; }
+    .song-row { gap: 8px; padding: 6px 10px; }
+}

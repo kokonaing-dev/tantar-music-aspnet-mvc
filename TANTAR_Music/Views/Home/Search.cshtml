@@ -1,0 +1,60 @@
+@model IEnumerable<SongListItemViewModel>
+@{ ViewData["Title"] = "Search"; }
+
+<div class="page-content">
+    <form asp-action="Search" method="get" class="mb-4">
+        <div class="input-group" style="max-width:500px">
+            <input type="text" name="q" value="@ViewBag.Query" class="form-control bg-dark border-secondary text-white"
+                   placeholder="Artists, songs, or albums…" autofocus />
+            <button type="submit" class="btn btn-tantar px-4">
+                <i class="bi bi-search"></i>
+            </button>
+        </div>
+    </form>
+
+    @if (ViewBag.Query != null)
+    {
+        <h5 class="text-secondary mb-3">Results for "@ViewBag.Query"</h5>
+
+        @if (!Model.Any())
+        {
+            <p class="text-secondary">No songs found.</p>
+        }
+        else
+        {
+            <div class="mb-2 text-secondary small">
+                <div class="song-row fw-semibold" style="grid-template-columns:32px 40px 1fr auto 80px 60px">
+                    <span>#</span><span></span><span>Title</span><span>Album</span><span class="text-end">Plays</span><span class="text-end">Duration</span>
+                </div>
+                <hr class="border-secondary opacity-25 mt-1 mb-0" />
+            </div>
+            <div data-queue="search-results">
+                @{ int idx = 0; }
+                @foreach (var s in Model)
+                {
+                    idx++;
+                    <div class="song-row" data-queue-context="true">
+                        <span class="song-num text-secondary text-center">@idx</span>
+                        <button class="song-play btn btn-link p-0 text-white align-items-center justify-content-center"
+                                data-play="@s.FilePath"
+                                data-song-id="@s.Id"
+                                data-title="@s.Title"
+                                data-artist="@s.ArtistName"
+                                data-cover="@(s.CoverImagePath ?? "")">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <img src="@(s.CoverImagePath ?? "/images/default-cover.svg")" alt=""
+                             class="rounded" style="width:40px;height:40px;object-fit:cover" />
+                        <div class="overflow-hidden">
+                            <div class="song-title fw-semibold text-truncate">@s.Title</div>
+                            <div class="text-secondary small text-truncate">@s.ArtistName</div>
+                        </div>
+                        <span class="text-secondary small text-truncate">@(s.AlbumTitle ?? "–")</span>
+                        <span class="text-secondary small text-end">@s.PlayCount</span>
+                        <span class="text-secondary small text-end">@s.FormattedDuration</span>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

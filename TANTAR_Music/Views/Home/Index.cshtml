@@ -1,0 +1,132 @@
+@model HomeViewModel
+@{ ViewData["Title"] = "Home"; }
+
+<div class="page-content">
+
+    @if (Model.TopSongs.Any())
+    {
+        <section class="mb-5">
+            <div class="section-header">
+                <h2>Top Tracks</h2>
+                <a asp-controller="Song" asp-action="Index" class="section-link">See all</a>
+            </div>
+            <div data-queue="top-songs">
+                @for (int i = 0; i < Model.TopSongs.Count; i++)
+                {
+                    var s = Model.TopSongs[i];
+                    <div class="song-row">
+                        <span class="song-num text-secondary text-center">@(i + 1)</span>
+                        <button class="song-play btn btn-link p-0 text-white align-items-center justify-content-center"
+                                data-play="@s.FilePath"
+                                data-song-id="@s.Id"
+                                data-title="@s.Title"
+                                data-artist="@s.ArtistName"
+                                data-cover="@(s.CoverImagePath ?? "")">
+                            <i class="bi bi-play-fill"></i>
+                        </button>
+                        <img src="@(s.CoverImagePath ?? "/images/default-cover.svg")" alt=""
+                             class="rounded" style="width:40px;height:40px;object-fit:cover" />
+                        <div class="overflow-hidden">
+                            <div class="song-title fw-semibold text-truncate">@s.Title</div>
+                            <div class="text-secondary small text-truncate">@s.ArtistName</div>
+                        </div>
+                        <span class="text-secondary small">@(s.AlbumTitle ?? "–")</span>
+                        <span class="text-secondary small text-end">@s.PlayCount plays</span>
+                        <span class="text-secondary small text-end">@s.FormattedDuration</span>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.RecentAlbums.Any())
+    {
+        <section class="mb-5">
+            <div class="section-header">
+                <h2>New Albums</h2>
+                <a asp-controller="Album" asp-action="Index" class="section-link">See all</a>
+            </div>
+            <div class="grid-cards">
+                @foreach (var album in Model.RecentAlbums)
+                {
+                    <a asp-controller="Album" asp-action="Details" asp-route-id="@album.Id"
+                       class="tantar-card text-decoration-none text-white">
+                        <img src="@(album.CoverImagePath ?? "/images/default-cover.svg")"
+                             alt="@album.Title" class="tantar-card-cover" />
+                        <div class="fw-semibold text-truncate">@album.Title</div>
+                        <div class="small text-secondary text-truncate">@album.ArtistName</div>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.FeaturedArtists.Any())
+    {
+        <section class="mb-5">
+            <div class="section-header">
+                <h2>Featured Artists</h2>
+                <a asp-controller="Artist" asp-action="Index" class="section-link">See all</a>
+            </div>
+            <div class="grid-cards">
+                @foreach (var artist in Model.FeaturedArtists)
+                {
+                    <a asp-controller="Artist" asp-action="Details" asp-route-id="@artist.Id"
+                       class="tantar-card text-decoration-none text-white text-center">
+                        <img src="@(artist.ImagePath ?? "/images/default-artist.svg")"
+                             alt="@artist.Name" class="tantar-card-cover rounded-circle" />
+                        <div class="fw-semibold text-truncate">@artist.Name</div>
+                        <div class="small text-secondary">Artist</div>
+                    </a>
+                }
+            </div>
+        </section>
+    }
+
+    @if (Model.RecentSongs.Any())
+    {
+        <section class="mb-5">
+            <div class="section-header">
+                <h2>Recently Added</h2>
+                <a asp-controller="Song" asp-action="Index" class="section-link">See all</a>
+            </div>
+            <div class="grid-cards" data-queue="recent-songs">
+                @foreach (var s in Model.RecentSongs)
+                {
+                    <div class="tantar-card">
+                        <img src="@(s.CoverImagePath ?? "/images/default-cover.svg")"
+                             alt="@s.Title" class="tantar-card-cover" />
+                        <button class="play-btn-overlay"
+                                data-play="@s.FilePath"
+                                data-song-id="@s.Id"
+                                data-title="@s.Title"
+                                data-artist="@s.ArtistName"
+                                data-cover="@(s.CoverImagePath ?? "")">
+                            <i class="bi bi-play-fill fs-5"></i>
+                        </button>
+                        <div class="fw-semibold text-truncate text-white">@s.Title</div>
+                        <div class="small text-secondary text-truncate">@s.ArtistName</div>
+                    </div>
+                }
+            </div>
+        </section>
+    }
+
+    @if (!Model.RecentSongs.Any() && !Model.RecentAlbums.Any())
+    {
+        <div class="text-center py-5">
+            <i class="bi bi-music-note-beamed text-success" style="font-size:4rem"></i>
+            <h2 class="mt-3">Welcome to TANTAR Music</h2>
+            <p class="text-secondary">Start by adding artists, albums, and songs.</p>
+            @if (User.IsInRole("Admin"))
+            {
+                <a asp-controller="Artist" asp-action="Create" class="btn btn-tantar me-2">Add Artist</a>
+                <a asp-controller="Song" asp-action="Create" class="btn btn-outline-light">Upload Song</a>
+            }
+            else
+            {
+                <a asp-controller="Account" asp-action="Register" class="btn btn-tantar">Get Started</a>
+            }
+        </div>
+    }
+</div>

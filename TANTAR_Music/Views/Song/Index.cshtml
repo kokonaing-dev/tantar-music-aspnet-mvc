@@ -1,0 +1,98 @@
+@model IEnumerable<SongListItemViewModel>
+@{
+    ViewData["Title"] = "Songs";
+    bool isAdmin = User.IsInRole("Admin");
+    bool isAuth = User.Identity?.IsAuthenticated == true;
+    bool showActions = isAdmin || isAuth;
+}
+
+<div class="page-content">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold mb-0">Songs</h1>
+        @if (isAdmin)
+        {
+            <a asp-action="Create" class="btn btn-tantar">
+                <i class="bi bi-cloud-upload me-2"></i>Upload Song
+            </a>
+        }
+    </div>
+
+    @if (!Model.Any())
+    {
+        <p class="text-secondary">No songs yet.</p>
+    }
+    else
+    {
+        <div class="mb-2 text-secondary small px-4">
+            <div class="song-row @(showActions ? "has-actions" : "")">
+                <span>#</span><span></span><span>Title</span><span>Album</span>
+                <span class="text-end">Plays</span><span class="text-end">Duration</span>
+                @if (showActions) { <span></span> }
+            </div>
+            <hr class="border-secondary opacity-25 mt-1 mb-0" />
+        </div>
+
+        <div data-queue="songs-list">
+            @{ int i = 0; }
+            @foreach (var s in Model)
+            {
+                i++;
+                <div class="song-row @(showActions ? "has-actions" : "")" data-queue-context="true">
+                    <span class="song-num text-secondary text-center">@i</span>
+                    <button class="song-play btn btn-link p-0 text-white align-items-center justify-content-center"
+                            data-play="@s.FilePath" data-song-id="@s.Id"
+                            data-title="@s.Title" data-artist="@s.ArtistName"
+                            data-cover="@(s.CoverImagePath ?? "")">
+                        <i class="bi bi-play-fill"></i>
+                    </button>
+                    <img src="@(s.CoverImagePath ?? "/images/default-cover.svg")" alt=""
+                         class="rounded" style="width:40px;height:40px;object-fit:cover" />
+                    <div class="overflow-hidden">
+                        <div class="song-title fw-semibold text-truncate">@s.Title</div>
+                        <div class="text-secondary small text-truncate">@s.ArtistName</div>
+                    </div>
+                    <span class="text-secondary small text-truncate">@(s.AlbumTitle ?? "–")</span>
+                    <span class="text-secondary small text-end">@s.PlayCount</span>
+                    <span class="text-secondary small text-end">@s.FormattedDuration</span>
+
+                    @if (showActions)
+                    {
+                        <div class="dropdown d-flex justify-content-end">
+                            <button class="btn btn-link p-0 song-actions-btn"
+                                    data-bs-toggle="dropdown" aria-expanded="false" title="More options">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                @if (isAuth)
+                                {
+                                    <li>
+                                        <button class="dropdown-item" data-add-to-playlist="@s.Id">
+                                            <i class="bi bi-plus-circle me-2"></i>Add to playlist
+                                        </button>
+                                    </li>
+                                }
+                                @if (isAdmin)
+                                {
+                                    @if (isAuth) { <li><hr class="dropdown-divider" /></li> }
+                                    <li>
+                                        <a class="dropdown-item" asp-action="Edit" asp-route-id="@s.Id">
+                                            <i class="bi bi-pencil me-2"></i>Edit
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                              onsubmit="return confirm('Delete «@s.Title»?')">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i>Delete
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+</div>

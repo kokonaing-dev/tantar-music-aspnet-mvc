@@ -1,0 +1,26 @@
+@model IEnumerable<PlaylistDetailViewModel>
+@{ ViewData["Title"] = "Public Playlists"; }
+
+<div class="page-content">
+    <h1 class="fw-bold mb-4">Public Playlists</h1>
+
+    @if (!Model.Any())
+    {
+        <p class="text-secondary">No public playlists yet.</p>
+    }
+    else
+    {
+        <div class="grid-cards">
+            @foreach (var p in Model)
+            {
+                <a asp-action="Details" asp-route-id="@p.Id"
+                   class="tantar-card text-decoration-none text-white">
+                    <img src="@(p.CoverImagePath ?? "/images/default-cover.svg")"
+                         alt="@p.Name" class="tantar-card-cover" />
+                    <div class="fw-semibold text-truncate">@p.Name</div>
+                    <div class="small text-secondary text-truncate">by @p.OwnerName · @p.Songs.Count songs</div>
+                </a>
+            }
+        </div>
+    }
+</div>

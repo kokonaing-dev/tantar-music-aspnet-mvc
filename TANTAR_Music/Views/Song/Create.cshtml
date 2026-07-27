@@ -1,0 +1,57 @@
+@model SongViewModel
+@{ ViewData["Title"] = "Upload Song"; }
+
+<div class="page-content">
+    <div class="tantar-form-card" style="max-width:600px">
+        <h1 class="fw-bold mb-4">Upload Song</h1>
+
+        <form asp-action="Create" method="post" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger mb-3 small"></div>
+
+            <div class="mb-3">
+                <label asp-for="Title" class="form-label fw-semibold"></label>
+                <input asp-for="Title" class="form-control bg-dark border-secondary text-white" placeholder="Song title" />
+                <span asp-validation-for="Title" class="text-danger small"></span>
+            </div>
+            <div class="row mb-3">
+                <div class="col">
+                    <label asp-for="ArtistId" class="form-label fw-semibold"></label>
+                    <select asp-for="ArtistId" asp-items="Model.Artists" class="form-select bg-dark border-secondary text-white">
+                        <option value="">– Select artist –</option>
+                    </select>
+                    <span asp-validation-for="ArtistId" class="text-danger small"></span>
+                </div>
+                <div class="col">
+                    <label asp-for="AlbumId" class="form-label fw-semibold"></label>
+                    <select asp-for="AlbumId" asp-items="Model.Albums" class="form-select bg-dark border-secondary text-white">
+                        <option value="">– No album –</option>
+                    </select>
+                </div>
+            </div>
+            <div class="mb-3">
+                <label asp-for="Genre" class="form-label fw-semibold"></label>
+                <input asp-for="Genre" class="form-control bg-dark border-secondary text-white" placeholder="e.g. Pop, Rock, Jazz…" />
+            </div>
+            <div class="mb-3">
+                <label asp-for="AudioFile" class="form-label fw-semibold"></label>
+                <input asp-for="AudioFile" type="file" accept=".mp3,.wav,.ogg,.flac,.m4a"
+                       class="form-control bg-dark border-secondary text-white" />
+                <div class="form-text text-secondary">MP3, WAV, OGG, FLAC, M4A</div>
+                <span asp-validation-for="AudioFile" class="text-danger small"></span>
+            </div>
+            <div class="mb-4">
+                <label asp-for="CoverImage" class="form-label fw-semibold"></label>
+                <input asp-for="CoverImage" type="file" accept="image/*"
+                       class="form-control bg-dark border-secondary text-white" />
+                <div class="form-text text-secondary">Optional – JPG, PNG, WEBP</div>
+            </div>
+
+            <div class="d-flex gap-2">
+                <button type="submit" class="btn btn-tantar px-4">Upload</button>
+                <a asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" /> }

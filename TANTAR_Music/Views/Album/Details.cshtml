@@ -1,0 +1,112 @@
+@model AlbumDetailViewModel
+@{
+    ViewData["Title"] = Model.Title;
+    bool isAdmin = User.IsInRole("Admin");
+    bool isAuth = User.Identity?.IsAuthenticated == true;
+    bool showActions = isAdmin || isAuth;
+}
+
+<div class="page-content">
+    <!-- Hero -->
+    <div class="d-flex align-items-end gap-4 mb-4 pb-3 border-bottom border-secondary">
+        <img src="@(Model.CoverImagePath ?? "/images/default-cover.svg")"
+             alt="@Model.Title" class="rounded shadow"
+             style="width:180px;height:180px;object-fit:cover;flex-shrink:0" />
+        <div>
+            <div class="text-secondary small text-uppercase fw-bold">Album</div>
+            <h1 class="fw-bold mb-1">@Model.Title</h1>
+            <div class="text-secondary">
+                <a asp-controller="Artist" asp-action="Details" asp-route-id="@Model.ArtistId"
+                   class="text-white fw-semibold">@Model.ArtistName</a>
+                · @Model.ReleaseDate.Year
+                @if (Model.Genre != null) { <span>· @Model.Genre</span> }
+                · @Model.Songs.Count song@(Model.Songs.Count != 1 ? "s" : "")
+            </div>
+            @if (isAdmin)
+            {
+                <div class="mt-3 d-flex gap-2">
+                    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-sm btn-outline-light">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- Song list -->
+    @if (Model.Songs.Any())
+    {
+        <div class="mb-2 text-secondary small px-4">
+            <div class="song-row @(showActions ? "has-actions" : "")">
+                <span>#</span><span></span><span>Title</span><span>Artist</span>
+                <span></span><span class="text-end">Duration</span>
+                @if (showActions) { <span></span> }
+            </div>
+            <hr class="border-secondary opacity-25 mt-1 mb-0" />
+        </div>
+        <div data-queue="album-songs">
+            @{ int i = 0; }
+            @foreach (var s in Model.Songs)
+            {
+                i++;
+                <div class="song-row @(showActions ? "has-actions" : "")" data-queue-context="true">
+                    <span class="song-num text-secondary text-center">@i</span>
+                    <button class="song-play btn btn-link p-0 text-white align-items-center justify-content-center"
+                            data-play="@s.FilePath" data-song-id="@s.Id"
+                            data-title="@s.Title" data-artist="@s.ArtistName"
+                            data-cover="@(s.CoverImagePath ?? Model.CoverImagePath ?? "")">
+                        <i class="bi bi-play-fill"></i>
+                    </button>
+                    <div style="width:40px;height:40px"></div>
+                    <div class="overflow-hidden">
+                        <div class="song-title fw-semibold text-truncate">@s.Title</div>
+                    </div>
+                    <span class="text-secondary small text-truncate">@s.ArtistName</span>
+                    <span></span>
+                    <span class="text-secondary small text-end">@s.FormattedDuration</span>
+
+                    @if (showActions)
+                    {
+                        <div class="dropdown d-flex justify-content-end">
+                            <button class="btn btn-link p-0 song-actions-btn"
+                                    data-bs-toggle="dropdown" title="More options">
+                                <i class="bi bi-three-dots"></i>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+                                @if (isAuth)
+                                {
+                                    <li>
+                                        <button class="dropdown-item" data-add-to-playlist="@s.Id">
+                                            <i class="bi bi-plus-circle me-2"></i>Add to playlist
+                                        </button>
+                                    </li>
+                                }
+                                @if (isAdmin)
+                                {
+                                    @if (isAuth) { <li><hr class="dropdown-divider" /></li> }
+                                    <li>
+                                        <a class="dropdown-item" asp-controller="Song" asp-action="Edit" asp-route-id="@s.Id">
+                                            <i class="bi bi-pencil me-2"></i>Edit song
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form asp-controller="Song" asp-action="Delete" asp-route-id="@s.Id" method="post"
+                                              onsubmit="return confirm('Delete «@s.Title»?')">
+                                            <button type="submit" class="dropdown-item text-danger">
+                                                <i class="bi bi-trash me-2"></i>Delete song
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-secondary mt-3">No songs in this album yet.</p>
+    }
+</div>
