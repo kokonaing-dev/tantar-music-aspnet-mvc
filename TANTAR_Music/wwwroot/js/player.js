@@ -75,26 +75,20 @@
     btnPrev.addEventListener('click', () => {
         if (audio.currentTime > 3) {
             audio.currentTime = 0;
-        } else if (queueIndex > 0) {
-            queueIndex--;
+        } else {
+            queueIndex = (queueIndex - 1 + queue.length) % queue.length;
             play(queue[queueIndex]);
         }
     });
 
     btnNext.addEventListener('click', () => {
-        if (queueIndex < queue.length - 1) {
-            queueIndex++;
-            play(queue[queueIndex]);
-        }
+        queueIndex = (queueIndex + 1) % queue.length;
+        play(queue[queueIndex]);
     });
 
     audio.addEventListener('ended', () => {
-        if (queueIndex < queue.length - 1) {
-            queueIndex++;
-            play(queue[queueIndex]);
-        } else {
-            setPlayIcon(false);
-        }
+        queueIndex = (queueIndex + 1) % queue.length;
+        play(queue[queueIndex]);
     });
 
     audio.addEventListener('timeupdate', () => {
@@ -132,23 +126,20 @@
             filePath: btn.dataset.play
         };
 
-        // Check if there's a queue context (song list)
-        const row = btn.closest('[data-queue-context]');
-        if (row) {
-            const container = row.closest('[data-queue-context]') || document.querySelector('[data-queue]');
-            if (container) {
-                const allBtns = container.querySelectorAll('[data-play]');
-                const songs = Array.from(allBtns).map(b => ({
-                    id: b.dataset.songId,
-                    title: b.dataset.title,
-                    artist: b.dataset.artist,
-                    cover: b.dataset.cover,
-                    filePath: b.dataset.play
-                }));
-                const idx = Array.from(allBtns).indexOf(btn);
-                window.TantarPlayer.setQueue(songs, idx);
-                return;
-            }
+        // Build queue from the songs list if available
+        const queueContainer = document.querySelector('[data-queue]');
+        if (queueContainer) {
+            const allBtns = Array.from(queueContainer.querySelectorAll('[data-play]'));
+            const songs = allBtns.map(b => ({
+                id: b.dataset.songId,
+                title: b.dataset.title,
+                artist: b.dataset.artist,
+                cover: b.dataset.cover,
+                filePath: b.dataset.play
+            }));
+            const idx = allBtns.indexOf(btn);
+            window.TantarPlayer.setQueue(songs, idx >= 0 ? idx : 0);
+            return;
         }
 
         window.TantarPlayer.playNow(song);
